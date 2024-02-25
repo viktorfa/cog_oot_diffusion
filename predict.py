@@ -10,28 +10,28 @@ class Predictor(BasePredictor):
         self.model = OOTDiffusionModel()
         self.model.load_pipe()
 
-        return model
+        return self.model
 
     # The arguments and types the model takes as input
     def predict(
         self,
-        model_image: Path = Input(description="Grayscale input image"),
-        garment_image: Path = Input(description="Grayscale input image"),
+        model_image: Path = Input(description="Clear picture of the model", default="https://raw.githubusercontent.com/viktorfa/oot_diffusion/main/oot_diffusion/assets/model_1.png"),
+        garment_image: Path = Input(description="Clear picture of upper body garment", default="https://raw.githubusercontent.com/viktorfa/oot_diffusion/main/oot_diffusion/assets/cloth_1.jpg"),
         steps: int = Input(
-            default=20, description="Grayscale input image", min=1, max=40
+            default=20, description="Inference steps", ge=1, le=40
         ),
         guidance_scale: float = Input(
-            default=2.0, description="Guidance scale", min=1.0, max=5.0
+            default=2.0, description="Guidance scale", ge=1.0, le=5.0
         ),
         seed: int = Input(
-            default=0, description="Grayscale input image", min=0, max=1000000
+            default=0, description="Seed", ge=0, le=0xFFFFFFFFFFFFFFFF
         ),
     ) -> Path:
         """Run a single prediction on the model"""
 
         generated_images, mask_image = self.model.generate(
             model_path=model_image,
-            cloth_image=garment_image,
+            cloth_path=garment_image,
             steps=steps,
             cfg=guidance_scale,
             seed=seed,
